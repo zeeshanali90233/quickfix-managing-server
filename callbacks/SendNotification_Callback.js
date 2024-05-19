@@ -7,6 +7,7 @@ async function SendNotification_CallBack(req, res) {
   if (!token) {
     return res.status(404).json({ message: "Receive Push Token Missing" });
   }
+  console.log(token);
   try {
     let messages = [];
     for (let pushToken of Array.isArray(token) ? token : [token]) {
