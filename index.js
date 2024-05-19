@@ -1,10 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import admin from "./lib/firebase.js";
 import { rateLimit } from "express-rate-limit";
-import { Expo } from "expo-server-sdk";
-import { getMessaging } from "firebase-admin/messaging";
 import V1_Main from "./controllers/V1/Main.js";
 import { initializeExpo } from "./lib/expo_server.js";
 
