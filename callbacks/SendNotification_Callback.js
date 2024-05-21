@@ -3,7 +3,6 @@ import expoInstance from "../lib/expo_server.js";
 
 async function SendNotification_CallBack(req, res) {
   const { token, messageBody, messageTitle } = req.body;
-
   if (!token) {
     return res.status(404).json({ message: "Receive Push Token Missing" });
   }
