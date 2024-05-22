@@ -16,10 +16,16 @@ async function SendNotification_CallBack(req, res) {
 
       messages.push({
         to: pushToken,
-        sound: "default",
+        sound: {
+          critical: true,
+          name: "default",
+          volume: 1,
+        },
         body: messageBody,
         title: messageTitle,
-        icon: "https://maxcool-server-production.up.railway.app/public/companyLogo.jpg",
+        icon: "https://maxcool-server-production.up.railway.app/public/companyLogo.png",
+        priority: "high",
+        ttl: 5000,
       });
     }
 

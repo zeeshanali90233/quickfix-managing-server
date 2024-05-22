@@ -4,7 +4,7 @@ function CheckUserAuthenticity(req, res, next) {
   if (!authToken) {
     return res
       .status(400)
-      .json({ status: "Error", message: "User Token is missing" });
+      .json({ status: "Error", message: "Auth Token is missing" });
   }
 
   if (authToken === process.env.CLIENT_AUTH_KEY) {
@@ -13,7 +13,7 @@ function CheckUserAuthenticity(req, res, next) {
 
   return res
     .status(401)
-    .json({ status: "Error", message: "Invalid User Token" });
+    .json({ status: "Error", message: "Invalid Auth Token" });
 }
 
 export default CheckUserAuthenticity;
