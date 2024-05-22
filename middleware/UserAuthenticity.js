@@ -1,13 +1,13 @@
 function CheckUserAuthenticity(req, res, next) {
-  const { userToken } = req.body;
+  const { authToken } = req.body;
 
-  if (!userToken) {
+  if (!authToken) {
     return res
       .status(400)
       .json({ status: "Error", message: "User Token is missing" });
   }
 
-  if (userToken === process.env.CLIENT_AUTH_KEY) {
+  if (authToken === process.env.CLIENT_AUTH_KEY) {
     return next();
   }
 
