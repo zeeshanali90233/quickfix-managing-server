@@ -19,7 +19,7 @@ async function SendNotification_CallBack(req, res) {
         sound: "default",
         body: messageBody,
         title: messageTitle,
-        icon: "https://maxcool-server-production.up.railway.app/",
+        icon: "https://maxcool-server-production.up.railway.app/public/companyLogo.jpg",
       });
     }
 
