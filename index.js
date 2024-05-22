@@ -20,6 +20,7 @@ app.use(initializeExpo);
 app.use(cors());
 app.use(limiter);
 app.use(express.json());
+app.use(express.static("public"));
 
 // V1
 app.use("/v1", V1_Main);
