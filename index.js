@@ -39,6 +39,7 @@ io.use(CheckSocketClientAuth);
 io.on("connection", (socket) => {
   console.log("New connection");
   socket.join(socket.handshake.query.groupId);
+  console.log(socket.handshake.query.groupId)
 
   socket.on("send_admin_message", (packet) => {
     console.log(packet);
