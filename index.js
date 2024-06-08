@@ -39,10 +39,10 @@ io.use(CheckSocketClientAuth);
 io.on("connection", (socket) => {
   console.log("New connection");
   socket.join(socket.handshake.query.groupId);
-  console.log(socket.handshake.query.groupId)
+  console.log(socket.handshake.query.groupId);
 
   socket.on("send_admin_message", (packet) => {
     console.log(packet);
-    io.to(packet.to).emit("admin_message", "asdlkjadslksajlkja");
+    io.to(packet.to).emit("admin_message", packet.message);
   });
 });
