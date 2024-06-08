@@ -33,16 +33,13 @@ app.get("/", async (req, res) => {
   res.status(200).json({ message: "Welcome to Maxcool Sever" });
 });
 
+// Socket IO
 const io = new Server(server, { cors: { origin: "*" } });
-
 io.use(CheckSocketClientAuth);
 io.on("connection", (socket) => {
-  console.log("New connection");
   socket.join(socket.handshake.query.groupId);
-  console.log(socket.handshake.query.groupId);
 
-  socket.on("send_admin_message", (packet) => {
-    console.log(packet);
-    io.to(packet.to).emit("admin_message", packet.message);
+  socket.on("send_message", (packet) => {
+    io.to(packet.to).emit("notification", packet.message);
   });
 });
