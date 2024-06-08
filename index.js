@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { rateLimit } from "express-rate-limit";
 import V1_Main from "./controllers/V1/Main.js";
+import { Server } from "socket.io";
+import CheckSocketClientAuth from "./middleware/SocketUserAuth.js";
 
 dotenv.config();
 
@@ -23,10 +25,23 @@ app.use("/public", express.static("public"));
 // V1
 app.use("/v1", V1_Main);
 
+const server = app.listen(process.env.PORT || 8080, () => {
+  console.log(`Server is listening at ${process.env.PORT || 3000}`);
+});
+
 app.get("/", async (req, res) => {
   res.status(200).json({ message: "Welcome to Maxcool Sever" });
 });
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log(`Server is listening at ${process.env.PORT || 3000}`);
+const io = new Server(server, { cors: { origin: "*" } });
+
+io.use(CheckSocketClientAuth);
+io.on("connection", (socket) => {
+  console.log("New connection");
+  socket.join(socket.handshake.query.groupId);
+
+  socket.on("send_admin_message", (packet) => {
+    console.log(packet);
+    io.to(packet.to).emit("admin_message", "asdlkjadslksajlkja");
+  });
 });
