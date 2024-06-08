@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { rateLimit } from "express-rate-limit";
 import V1_Main from "./controllers/V1/Main.js";
-import { initializeExpo } from "./lib/expo_server.js";
 
 dotenv.config();
 
@@ -16,11 +15,10 @@ const limiter = rateLimit({
 
 const app = express();
 
-app.use(initializeExpo);
 app.use(cors());
 app.use(limiter);
 app.use(express.json());
-app.use("/public",express.static("public"));
+app.use("/public", express.static("public"));
 
 // V1
 app.use("/v1", V1_Main);
