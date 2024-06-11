@@ -1,7 +1,7 @@
 import admin from "../lib/firebase.js";
 
-async function ResetUserPassword_Callback(req, res) {
-  const { userId } = req.body;
+async function DeleteUser_Callback(req, res) {
+  const { userId } = req.query;
   if (!userId) {
     return res.status(404).json({ message: "User Id is missing" });
   }
@@ -18,4 +18,4 @@ async function ResetUserPassword_Callback(req, res) {
   }
 }
 
-export default ResetUserPassword_Callback;
+export default DeleteUser_Callback;
