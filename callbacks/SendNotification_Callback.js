@@ -1,6 +1,7 @@
 import { Expo } from "expo-server-sdk";
 import expoInstance from "../lib/expo_server.js";
 import admin from "../lib/firebase.js";
+import { getMessaging } from "firebase-admin/messaging";
 
 async function SendNotification_CallBack(req, res) {
   const { token, messageBody, messageTitle, imageURL } = req.body;
@@ -22,7 +23,7 @@ async function SendNotification_CallBack(req, res) {
           name: "default",
           volume: 1,
         },
-        channelId: "default",
+        channelId: "priority",
         body: messageBody,
         title: messageTitle,
         icon:
@@ -68,7 +69,7 @@ async function SendNotification_CallBack(req, res) {
     //   messageConfig.notification.imageUrl = imageURL;
     // }
 
-    // const firebaseTicket = await admin.messaging().sendToCondition(messageConfig);
+    // const firebaseTicket = await getMessaging().send(messageConfig);
 
     // return res.status(200).json({ status: "Ok", ticketChunk: firebaseTicket });
     return res.status(200).json({ status: "Ok", ticketChunk: tickets });
