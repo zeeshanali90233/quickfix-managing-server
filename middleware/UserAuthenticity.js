@@ -1,5 +1,5 @@
 function CheckUserAuthenticity(req, res, next) {
-  const { authToken } = req.body || req.query;
+  const { authToken } = req.body;
 
   if (!authToken) {
     return res
