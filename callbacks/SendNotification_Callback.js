@@ -30,6 +30,7 @@ async function SendNotification_CallBack(req, res) {
           imageURL ??
           "https://maxcool-server-production.up.railway.app/public/companyLogo.png",
         priority: "high",
+
         ttl: 5000,
       });
     }
