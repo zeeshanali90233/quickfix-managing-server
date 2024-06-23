@@ -4,7 +4,7 @@ import admin from "../lib/firebase.js";
 import { getMessaging } from "firebase-admin/messaging";
 
 async function SendNotification_CallBack(req, res) {
-  const { token, messageBody, messageTitle, imageURL } = req.body;
+  const { token, messageBody, messageTitle, imageURL, data } = req.body;
   if (!token) {
     return res.status(404).json({ message: "Receive Push Token Missing" });
   }
@@ -26,6 +26,7 @@ async function SendNotification_CallBack(req, res) {
         channelId: "priority",
         body: messageBody,
         title: messageTitle,
+        data: data ?? { url: null },
         icon:
           imageURL ??
           "https://maxcool-server-production.up.railway.app/public/companyLogo.png",
