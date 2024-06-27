@@ -1,20 +1,27 @@
 import admin from "../lib/firebase.js";
 
 async function DeleteUser_Callback(req, res) {
-  const { userId } = req.query;
-  if (!userId) {
-    return res.status(404).json({ message: "User Id is missing" });
+  const { uid, collectionName, profileImageURL } = req.body;
+  if (!uid) {
+    return res.status(404).json({ message: "UID is not complete" });
+  } else if (!collectionName) {
+    return res.status(404).json({ message: "Collection Name is not complete" });
   }
+
   try {
-    await admin
-      .auth()
-      .updateUser(userId, { password: process.env.DEFAULT_PASSWORD });
+    await admin.firestore().collection(collectionName).doc(uid).delete();
+    if (profileImageURL) {
+      await admin.storage().bucket().file(profileImageURL).delete();
+    }
+    await admin.auth().deleteUser(uid);
     return res.status(200).json({
       status: "Ok",
-      message: `Password Reseted to default ` + process.env.DEFAULT_PASSWORD,
+      message: "User Details has been successfully deleted",
     });
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json({ error: error?.message || "Internal server error" });
   }
 }
 
