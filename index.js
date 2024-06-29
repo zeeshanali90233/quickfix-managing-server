@@ -6,6 +6,7 @@ import V1_Main from "./controllers/V1/Main.js";
 import { Server } from "socket.io";
 import CheckSocketClientAuth from "./middleware/SocketUserAuth.js";
 import cron from "node-cron";
+import { DeletePhotoFromStorage } from "./lib/firebase.js";
 
 dotenv.config();
 
@@ -34,9 +35,8 @@ app.get("/", async (req, res) => {
   res.status(200).json({ message: "Welcome to Maxcool Sever" });
 });
 
-cron.schedule("* * * * *", () => {
-  console.log(new Date().getTime());
-});
+// Cron Jobs 2 Days Every Day
+cron.schedule("* * */2 * *", async () => await DeletePhotoFromStorage());
 
 // Socket IO
 const io = new Server(server, { cors: { origin: "*" } });
