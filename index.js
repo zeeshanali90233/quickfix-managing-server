@@ -5,6 +5,7 @@ import { rateLimit } from "express-rate-limit";
 import V1_Main from "./controllers/V1/Main.js";
 import { Server } from "socket.io";
 import CheckSocketClientAuth from "./middleware/SocketUserAuth.js";
+import cron from "node-cron";
 
 dotenv.config();
 
@@ -31,6 +32,10 @@ const server = app.listen(process.env.PORT || 8080, () => {
 
 app.get("/", async (req, res) => {
   res.status(200).json({ message: "Welcome to Maxcool Sever" });
+});
+
+cron.schedule("* * * * *", () => {
+  console.log(new Date().getTime());
 });
 
 // Socket IO
