@@ -6,7 +6,7 @@ import V1_Main from "./controllers/V1/Main.js";
 import { Server } from "socket.io";
 import CheckSocketClientAuth from "./middleware/SocketUserAuth.js";
 import cron from "node-cron";
-import { DeletePhotoFromStorage } from "./lib/firebase.js";
+import { DeletePhotoFromStorage, RemovePushToken } from "./lib/firebase.js";
 
 dotenv.config();
 
@@ -46,5 +46,13 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (packet) => {
     io.to(packet.to).emit("notification", packet.message);
+  });
+
+  socket.on("remove_push_token", async (packet) => {
+    await RemovePushToken(packet.collectionName, packet.uid);
+  });
+
+  socket.on("public_announcement", (packet) => {
+    socket.broadcast.emit("public_announcement", packet);
   });
 });
