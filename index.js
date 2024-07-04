@@ -49,7 +49,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("remove_push_token", async (packet) => {
-    await RemovePushToken(packet.collectionName, packet.uid);
+    try {
+      await RemovePushToken(packet.collectionName, packet.uid);
+    } catch (err) {}
   });
 
   socket.on("public_announcement", (packet) => {
