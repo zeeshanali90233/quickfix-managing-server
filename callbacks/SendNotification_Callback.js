@@ -27,12 +27,12 @@ async function SendNotification_CallBack(req, res) {
         body: messageBody,
         title: messageTitle,
         data: data ?? { url: null },
+        // vibrate: [500, 1000, 500, 1000],
         icon:
           imageURL ??
           "https://maxcool-server-production.up.railway.app/public/companyLogo.png",
         priority: "high",
-
-        ttl: 5000,
+        ttl: 2419200,
       });
     }
 
