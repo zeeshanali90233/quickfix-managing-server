@@ -57,4 +57,7 @@ io.on("connection", (socket) => {
   socket.on("public_announcement", (packet) => {
     socket.broadcast.emit("public_announcement", packet);
   });
+  socket.on("update_alert", (packet) => {
+    io.to(packet.to).emit("update_alert", packet);
+  });
 });
