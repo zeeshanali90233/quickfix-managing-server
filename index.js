@@ -37,16 +37,29 @@ const server = app.listen(process.env.PORT || 8080, () => {
 });
 
 // Socket IO
-const io = new Server(server, { cors: { origin: "*" } });
+export const io = new Server(server, { cors: { origin: "*" } });
 io.use(CheckSocketClientAuth);
-io.on("connection", (socket) => {
-  socket.join(socket.handshake.query.groupId);
+
+const notificationNamespace = io.of("/notification");
+
+notificationNamespace.on("connection", (socket) => {
+  socket.join(socket.handshake.query.userId);
 
   socket.on("send_message", (packet) => {
-    io.to(packet.to).emit("notification", packet.message);
+    notificationNamespace.to(packet.to).emit("notification", packet.message);
   });
 
   socket.on("public_announcement", (packet) => {
     socket.broadcast.emit("public_announcement", packet);
+  });
+});
+
+const chatNamespace = io.of("/chat");
+chatNamespace.on("connection", (socket) => {
+  socket.join(socket.handshake.query.groupId);
+  // console.log(socket.handshake.query.groupId);
+
+  socket.on("send", (packet) => {
+    chatNamespace.to(packet.to).emit("receive", packet);
   });
 });
