@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { rateLimit } from "express-rate-limit";
-import V1_Main from "./controllers/v1/Main.mjs";
+import V1_Main from "./controllers/V1/Main.mjs";
 import { Server } from "socket.io";
 import CheckSocketClientAuth from "./middleware/SocketUserAuth.js";
 import { ConnectMongoDB } from "./lib/mongodb.js";
