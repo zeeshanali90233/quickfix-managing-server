@@ -1,4 +1,4 @@
-import { dialogFlowClient } from "../../../index.js";
+import { dialogFlowClient } from "../../../index.mjs";
 import { detectIntentText } from "../../../lib/dialogflow.js";
 
 export async function DialogFlowResponse_Callback(req, res) {
