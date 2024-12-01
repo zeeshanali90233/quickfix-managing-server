@@ -1,7 +1,7 @@
 {
-  "name": "maxcool-server",
+  "name": "quickfix-server",
   "version": "1.0.0",
-  "description": "It is an maxcool official server",
+  "description": "It is quickFix official server",
   "main": "index.js",
   "type": "module",
   "scripts": {
