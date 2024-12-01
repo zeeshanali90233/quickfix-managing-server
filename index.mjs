@@ -2,12 +2,18 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { rateLimit } from "express-rate-limit";
-import V1_Main from "./controllers/v1/Main.js";
+import V1_Main from "./controllers/v1/Main.mjs";
 import { Server } from "socket.io";
 import CheckSocketClientAuth from "./middleware/SocketUserAuth.js";
 import { ConnectMongoDB } from "./lib/mongodb.js";
+import { SessionsClient } from "@google-cloud/dialogflow-cx";
 
 dotenv.config();
+
+// Instantiate a client
+export const dialogFlowClient = new SessionsClient({
+  apiEndpoint: `${process.env.LOCATION}-dialogflow.googleapis.com`,
+});
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
