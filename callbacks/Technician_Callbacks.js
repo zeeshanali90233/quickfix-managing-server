@@ -14,7 +14,7 @@ const CreateTechnician = async (req, res) => {
       phone,
       designation,
       image: image || null,
-      //   createdAt: adminInstance.firestore.FieldValue.serverTimestamp(),
+      createdAt: adminInstance.firestore.FieldValue.serverTimestamp(),
     };
 
     const technicianDoc = await adminInstance
@@ -28,13 +28,26 @@ const CreateTechnician = async (req, res) => {
       technician: technicianData,
     });
   } catch (error) {
-    console.error("Error while adding technician:", error);
     res.status(500).json({ message: "Failed to add technician", error });
   }
 };
 
 const GetTechnicians = async (req, res) => {
+  const { id } = req.params;
+
   try {
+    if (id) {
+      const docRef = await adminInstance
+        .firestore()
+        .collection("technicians")
+        .doc(id)
+        .get();
+
+      return res.status(200).json({
+        message: "Technician Detail is shared.",
+        technician: { ...docRef.data(), firebaseId: docRef.id },
+      });
+    }
     const snapshot = await adminInstance
       .firestore()
       .collection("technicians")
@@ -49,7 +62,6 @@ const GetTechnicians = async (req, res) => {
       .status(200)
       .json({ message: "Technicians fetched successfully", technicians });
   } catch (error) {
-    console.error("Error while fetching technicians:", error);
     res.status(500).json({ message: "Failed to fetch technicians", error });
   }
 };
@@ -66,7 +78,6 @@ const DeleteTechnician = async (req, res) => {
 
     res.status(200).json({ message: "Technician deleted successfully." });
   } catch (error) {
-    console.error("Error while deleting technician:", error);
     res.status(500).json({ message: "Failed to delete technician", error });
   }
 };

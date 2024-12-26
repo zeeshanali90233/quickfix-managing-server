@@ -5,31 +5,29 @@ import DeleteUser_Callback from "../../callbacks/DeleteUser_Callback.js";
 import {
   CreateAdmin,
   DeleteAdmin,
-  FetchAllAdmins,
-} from "../../callbacks/CreateAdmin_Callback.js";
+  FetchAdmin,
+} from "../../callbacks/Admin_Callbacks.js";
 import {
   CreateTechnician,
   DeleteTechnician,
   GetTechnicians,
-} from "../../callbacks/AddTechnician_Callback.js";
+} from "../../callbacks/Technician_Callbacks.js";
 
 const Router = express.Router();
 
-Router.post(
-  "/reset_password",
-  CheckUserAuthenticity,
-  ResetUserPassword_Callback
-);
-Router.delete("/delete", CheckUserAuthenticity, DeleteUser_Callback);
-
 //Admin Routes
 Router.post("/admins/add", CreateAdmin);
-Router.get("/admins", FetchAllAdmins);
+Router.get("/admin:id", FetchAdmin);
 Router.delete("/admins/:id", DeleteAdmin);
 
 //Technician Routes
 Router.post("/technicians/add", CreateTechnician);
-Router.get("/technicians", GetTechnicians);
+Router.get("/technician:id", GetTechnicians);
 Router.delete("/technicians/:id", DeleteTechnician);
+Router.post(
+  "/technicians/reset_password",
+  CheckUserAuthenticity,
+  ResetUserPassword_Callback
+);
 
 export default Router;

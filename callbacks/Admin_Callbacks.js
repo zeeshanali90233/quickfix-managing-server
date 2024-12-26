@@ -52,8 +52,21 @@ const CreateAdmin = async (req, res) => {
   }
 };
 
-const FetchAllAdmins = async (req, res) => {
+const FetchAdmin = async (req, res) => {
+  const { id } = req.params;
   try {
+    if (id) {
+      const docRef = await adminInstance
+        .firestore()
+        .collection("admins")
+        .doc(id)
+        .get();
+
+      return res.status(200).json({
+        message: "Admin Detail is shared.",
+        admin: { ...docRef.data(), firebaseId: docRef.id },
+      });
+    }
     const adminsSnapshot = await adminInstance
       .firestore()
       .collection("admins")
@@ -108,4 +121,4 @@ const DeleteAdmin = async (req, res) => {
   }
 };
 
-export { CreateAdmin, FetchAllAdmins, DeleteAdmin };
+export { CreateAdmin, FetchAdmin, DeleteAdmin };
