@@ -12,6 +12,11 @@ import {
   DeleteTechnician,
   GetTechnicians,
 } from "../../callbacks/Technician_Callbacks.js";
+import {
+  CreateClientAnnouncement,
+  FetchClientAnnouncements,
+  DeleteClientAnnouncement,
+} from "../../callbacks/ClientAnnoucement_Callback.js";
 
 const Router = express.Router();
 
@@ -24,10 +29,10 @@ Router.delete("/admins/:id", DeleteAdmin);
 Router.post("/technicians/add", CreateTechnician);
 Router.get("/technician:id", GetTechnicians);
 Router.delete("/technicians/:id", DeleteTechnician);
-Router.post(
-  "/technicians/reset_password",
-  CheckUserAuthenticity,
-  ResetUserPassword_Callback
-);
+
+// Client Announcement Routes
+Router.post("/announcements/add", CreateClientAnnouncement);
+Router.get("/announcements", FetchClientAnnouncements);
+Router.delete("/announcements/:id", DeleteClientAnnouncement);
 
 export default Router;

@@ -9,4 +9,7 @@ Router.put("/update/:id", DeleteUser_Callback);
 Router.post("/save", DeleteUser_Callback);
 Router.get("/:id", getRequestCallback);
 
+
+Router.get("/chatbot/get", getRequestCallback);
+
 export default Router;

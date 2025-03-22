@@ -60,7 +60,7 @@ const GetTechnicians = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Technicians fetched successfully", technicians });
+      .json({ message: "Technicians fetched successfully:", technicians });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch technicians", error });
   }
@@ -70,13 +70,13 @@ const DeleteTechnician = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    return res.status(400).json({ message: "Technician ID is required." });
+    return res.status(400).json({ message: "Technician ID is required:" });
   }
 
   try {
     await adminInstance.firestore().collection("technicians").doc(id).delete();
 
-    res.status(200).json({ message: "Technician deleted successfully." });
+    res.status(200).json({ message: "Technician deleted successfully:" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete technician", error });
   }
