@@ -1,36 +1,59 @@
 import { adminInstance } from "../lib/firebase.js";
+import { getDatabase } from "firebase-admin/database"; // Import Realtime Database from Firebase Admin
+
+
 
 const CreateTechnician = async (req, res) => {
-  const { name, email, phone, designation, image } = req.body;
+  const { name, email, password, phone, designation } = req.body;
 
-  if (!name || !email || !phone || !designation) {
+  // Validate required fields
+  if (!name || !email || !password || !phone || !designation) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
   try {
-    const technicianData = {
-      name,
+    // Create user in Firebase Authentication
+    const technicianDoc = await adminInstance.auth().createUser({
       email,
-      phone,
-      designation,
-      image: image || null,
-      createdAt: adminInstance.firestore.FieldValue.serverTimestamp(),
-    };
-
-    const technicianDoc = await adminInstance
-      .firestore()
-      .collection("technicians")
-      .add(technicianData);
-
-    res.status(201).json({
-      message: "Technician added successfully",
-      technicianId: technicianDoc.id,
-      technician: technicianData,
+      password,
+      displayName: name,
+      //phoneNumber: phone, // Ensure phone format is +1234567890
     });
+    const db = getDatabase(); // Get Database Instance
+    const { uid } = technicianDoc; // Replace this with the actual user ID
+
+    db.ref(`users/${uid}/userData`)
+      .set({
+        name,
+        email,
+        phone,
+        designation,
+        role: 1,
+      })
+      .then(() => {
+        console.log("Added in Realtime Database");
+      })
+      .catch((error) => {
+        console.error("Error adding to Realtime Database:", error);
+      });
+
+
+    return res.status(201).json({
+      message: "Technician added successfully",
+      technicianId: technicianDoc.uid,
+      technicianDoc
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Failed to add technician", error });
+    console.error("Error creating technician:", error.message);
+    return res.status(500).json({
+      error: "Technician not added",
+      details: error.message,
+    });
   }
 };
+
+
 
 const GetTechnicians = async (req, res) => {
   const { id } = req.params;
