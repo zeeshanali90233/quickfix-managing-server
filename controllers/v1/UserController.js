@@ -5,7 +5,8 @@ import DeleteUser_Callback from "../../callbacks/DeleteUser_Callback.js";
 import {
   CreateAdmin,
   DeleteAdmin,
-  FetchAdmin,
+  GetAllAdmins,
+  UpdateAdmin,
 } from "../../callbacks/Admin_Callbacks.js";
 import {
   CreateTechnician,
@@ -23,9 +24,10 @@ import {
 const Router = express.Router();
 
 //Admin Routes
-Router.post("/admins/add", CreateAdmin);
-Router.get("/admin:id", FetchAdmin);
-Router.delete("/admins/:id", DeleteAdmin);
+Router.post("/admin/add", CreateAdmin);
+Router.get("/admins", GetAllAdmins);
+Router.delete("/admin/:id", DeleteAdmin);
+Router.put("/admin/:id", UpdateAdmin);
 
 //Technician Routes
 Router.post("/technician/add", CreateTechnician);
