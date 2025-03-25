@@ -19,11 +19,6 @@ import {
   FetchClientAnnouncements,
   DeleteClientAnnouncement,
 } from "../../callbacks/ClientAnnoucement_Callback.js";
-import {
-  CreateTechnician,
-  DeleteTechnician,
-  GetTechnicians,
-} from "../../callbacks/Technician_Callbacks.js";
 
 const Router = express.Router();
 

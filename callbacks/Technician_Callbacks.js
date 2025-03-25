@@ -3,7 +3,6 @@ import { getDatabase } from "firebase-admin/database"; // Import Realtime Databa
 
 const CreateTechnician = async (req, res) => {
   const { name, email, password, phone, designation } = req.body;
-  const { name, email, password, phone, designation } = req.body;
 
   if (!name || !email || !password || !phone || !designation) {
     return res.status(400).json({ message: "All fields are required." });
@@ -35,7 +34,6 @@ const CreateTechnician = async (req, res) => {
         console.error("Error adding to Realtime Database:", error);
       });
 
-    return res.status(201).json({
     return res.status(201).json({
       message: "Technician added successfully",
       technicianId: technicianDoc.uid,
@@ -108,7 +106,6 @@ const GetTechnicianByID = async (req, res) => {
       message: "Technician details.",
       technician: { id, ...technicianData },
     });
-
   } catch (error) {
     console.error("Error fetching technician:", error);
     return res.status(500).json({
