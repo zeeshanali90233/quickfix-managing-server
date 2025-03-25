@@ -10,7 +10,9 @@ import {
 import {
   CreateTechnician,
   DeleteTechnician,
-  GetTechnicians,
+  GetTechnicianByID,
+  GetAllTechnicians,
+  UpdateTechnician,
 } from "../../callbacks/Technician_Callbacks.js";
 import {
   CreateClientAnnouncement,
@@ -26,9 +28,11 @@ Router.get("/admin:id", FetchAdmin);
 Router.delete("/admins/:id", DeleteAdmin);
 
 //Technician Routes
-Router.post("/technicians/add", CreateTechnician);
-Router.get("/technician:id", GetTechnicians);
-Router.delete("/technicians/:id", DeleteTechnician);
+Router.post("/technician/add", CreateTechnician);
+Router.get("/technicians", GetAllTechnicians);
+Router.get("/technician/:id", GetTechnicianByID);
+Router.put("/technician/:id", UpdateTechnician);
+Router.delete("/technician/:id", DeleteTechnician);
 
 // Client Announcement Routes
 Router.post("/announcements/add", CreateClientAnnouncement);
