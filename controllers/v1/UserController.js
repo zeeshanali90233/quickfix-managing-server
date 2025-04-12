@@ -20,6 +20,11 @@ import {
   FetchClientAnnouncements,
   DeleteClientAnnouncement,
 } from "../../callbacks/ClientAnnoucement_Callback.js";
+import {
+  GetAllClients,
+  GetAllClientsRequests,
+  GetClientRequests,
+} from "../../callbacks/Client_Callbacks.js";
 
 const Router = express.Router();
 
@@ -40,5 +45,10 @@ Router.delete("/technician/:id", DeleteTechnician);
 Router.post("/announcements/add", CreateClientAnnouncement);
 Router.get("/announcements", FetchClientAnnouncements);
 Router.delete("/announcements/:id", DeleteClientAnnouncement);
+
+// Client Routes
+Router.get("/clients", GetAllClients);
+Router.get("/clients/requests", GetAllClientsRequests);
+Router.get("/clients/:id/requests", GetClientRequests);
 
 export default Router;
