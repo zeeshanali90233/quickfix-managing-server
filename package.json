@@ -1,6 +1,6 @@
 {
   "name": "quickfix-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "It is quickFix official server",
   "main": "app.js",
   "type": "module",
