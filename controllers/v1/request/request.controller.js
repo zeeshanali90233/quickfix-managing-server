@@ -40,5 +40,46 @@ const increaseRequestCallBack = (req, res) => {
     });
   }
 };
+const statusGetRequestsChatbotCallBack = async (req, res) => {
+  try {
+    const phoneNumber = req.query.id;
 
-export { increaseRequestCallBack };
+    if (!phoneNumber) {
+      return res.status(400).json({
+        message: "Phone number is required",
+      });
+    }
+
+    const db = getDatabase();
+    const requestsRef = db.ref("request");
+
+    const snapshot = await requestsRef
+      .orderByChild("contactNumber")
+      .equalTo(phoneNumber)
+      .limitToLast(2)
+      .once("value");
+
+    if (!snapshot.exists()) {
+      return res.status(404).json({
+        message: "No requests found for this phone number",
+      });
+    }
+
+    const requests = [];
+    snapshot.forEach((childSnapshot) => {
+      requests.push({
+        requestId: childSnapshot.key,
+        ...childSnapshot.val(),
+      });
+    });
+
+    return res.status(200).json(requests);
+  } catch (error) {
+    return res.status(500).json({
+      error: "Server error",
+      details: error.message,
+    });
+  }
+};
+
+export { increaseRequestCallBack, statusGetRequestsChatbotCallBack };
