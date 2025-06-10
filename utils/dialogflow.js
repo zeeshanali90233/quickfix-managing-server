@@ -26,8 +26,10 @@ export const detectIntentText = async (
   };
   try {
     const [response] = await client.detectIntent(request);
-    const responseMessage =
-      response.queryResult?.responseMessages?.[0]?.text?.text?.[0];
+    const responseMessage = response.queryResult?.responseMessages?.find(
+      (msg) => msg.text
+    )?.text?.text?.[0];
+
     if (responseMessage) {
       successCB(responseMessage);
     } else {

@@ -39,6 +39,7 @@ export const GetAllClients = async (req, res) => {
 
 export const GetAllClientsRequests = async (req, res) => {
   try {
+    console.log("Hi");
     const db = getDatabase(adminInstance);
     const usersRef = db.ref("users");
 
@@ -182,6 +183,158 @@ export const GetClientRequests = async (req, res) => {
       message: "Request processing error",
       error: error.message,
       errorId: errorId,
+    });
+  }
+};
+
+export const GetClientInfo = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+        code: "INVALID_USER_ID",
+      });
+    }
+
+    const db = getDatabase(adminInstance);
+    const userRef = db.ref(`users/${userId}`);
+    const packageRef = db.ref(`payments/${userId}`);
+
+    // Fetch both user and package data concurrently
+    const [userSnapshot, packageSnapshot] = await Promise.all([
+      userRef.once("value"),
+      packageRef.once("value"),
+    ]);
+
+    if (!userSnapshot.exists()) {
+      return res.status(404).json({
+        message: "User not found",
+        code: "USER_NOT_FOUND",
+      });
+    }
+
+    const userData = userSnapshot.val().userData;
+    if (userData?.role !== 2) {
+      return res.status(403).json({
+        message: "User is not a client",
+        code: "INVALID_ROLE",
+      });
+    }
+
+    const response = {
+      id: userId,
+      userData: userData,
+      package: packageSnapshot.exists() ? packageSnapshot.val() : null,
+    };
+    return res.status(200).json({
+      message: "Client info retrieved successfully",
+      clientInfo: response,
+    });
+  } catch (error) {
+    const errorId = Math.random().toString(36).substring(2, 9);
+    console.error(`[${errorId}] ${error.message}`);
+
+    return res.status(500).json({
+      message: "Failed to retrieve client info",
+      error: error.message,
+      errorId,
+    });
+  }
+};
+
+export const UpdateClientCredits = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { credits } = req.body;
+
+    if (!userId || !credits) {
+      return res.status(400).json({
+        message: "User ID and credits are required",
+        code: "INVALID_INPUT",
+      });
+    }
+
+    const db = getDatabase(adminInstance);
+    const date = new Date();
+    const monthYear = `${date.getMonth()}_${date.getFullYear()}`;
+    const creditRef = db.ref(`payments/${userId}/${monthYear}`);
+
+    await creditRef.update({
+      total: credits,
+      remaining: credits,
+      updatedAt: Date.now(),
+    });
+
+    return res.status(200).json({
+      message: "Credits updated successfully",
+      credits,
+    });
+  } catch (error) {
+    const errorId = Math.random().toString(36).substring(2, 9);
+    console.error(`[${errorId}] ${error.message}`);
+    return res.status(500).json({
+      message: "Failed to update credits",
+      error: error.message,
+      errorId,
+    });
+  }
+};
+
+export const BlockClient = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+        code: "INVALID_USER_ID",
+      });
+    }
+
+    const db = getDatabase(adminInstance);
+    const userRef = db.ref(`users/${userId}/userData`);
+
+    await userRef.update({
+      isBlocked: true,
+      blockedAt: Date.now(),
+    });
+
+    return res.status(200).json({
+      message: "User blocked successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to block user",
+      error: error.message,
+    });
+  }
+};
+
+export const UnblockClient = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+        code: "INVALID_USER_ID",
+      });
+    }
+
+    const db = getDatabase(adminInstance);
+    const userRef = db.ref(`users/${userId}/userData`);
+
+    await userRef.update({
+      isBlocked: false,
+      unblockedAt: Date.now(),
+    });
+
+    return res.status(200).json({
+      message: "User unblocked successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to unblock user",
+      error: error.message,
     });
   }
 };

@@ -18,3 +18,5 @@ export const {
   DEFAULT_PASSWORD,
   PORT,
 } = process.env;
+
+export const AGENT_NAME = "Service Agent";

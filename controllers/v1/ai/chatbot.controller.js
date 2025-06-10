@@ -86,7 +86,6 @@ export const dialogFlowResponse = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ ok: false, message: "Something went wrong" });
   }
 };
