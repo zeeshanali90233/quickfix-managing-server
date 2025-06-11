@@ -21,8 +21,8 @@ function initializeNotificationNamespace() {
   const notificationNamespace = io.of("/notification");
 
   notificationNamespace.on("connection", (socket) => {
-    const userId = socket.handshake.query.userId;
-    socket.join(userId);
+    const groupId= socket.handshake.query.groupId;
+    socket.join(groupId);
 
     socket.on("send_message", (packet) => {
       notificationNamespace.to(packet.to).emit("notification", packet.message);
