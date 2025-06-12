@@ -1,42 +1,89 @@
 import { getMessaging } from "firebase-admin/messaging";
-import { adminInstance } from "../../../firebase/admin.js";
 
-export const sendNotification = async (req, res) => {
-  const { token, messageBody, messageTitle, imageURL, data } = req.body;
+export const sendNotifications = async (req, res) => {
+  const { tokens, messageBody, messageTitle, imageURL, data } = req.body;
 
-  if (!token || !Array.isArray(token) || token.length === 0) {
+  // Validate inputs
+  if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
     return res
-      .status(404)
-      .json({ message: "Receive Push Token Missing or Invalid" });
+      .status(400)
+      .json({ message: "Push tokens are missing or invalid" });
+  }
+  if (
+    !tokens.every(
+      (token) => typeof token === "string" && token.trim().length > 0
+    )
+  ) {
+    return res
+      .status(400)
+      .json({ message: "One or more push tokens are invalid" });
+  }
+  if (
+    data &&
+    (typeof data !== "object" ||
+      Object.values(data).some((v) => typeof v !== "string"))
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Data payload must be an object with string values" });
   }
 
-  const message = {
-    notification: {
-      title: messageTitle || "Notification",
-      body: messageBody || "",
-      image: imageURL || undefined,
-    },
-    data: data || {},
-    tokens: token,
+  const notification = {
+    title: messageTitle || "Notification",
+    body: messageBody || "",
+    ...(imageURL && { image: imageURL }),
   };
 
-  try {
-    const response = await getMessaging(adminInstance).sendMulticast({
-      tokens: message.tokens,
-      notification: message.notification,
-      data: message.data,
-    });
+  const messaging = getMessaging();
 
-    return res.status(200).json({
-      status: "Ok",
-      errors: response.responses
-        .filter((r) => !r.success)
-        .map((r) => r.error?.message || "Unknown error"),
+  // Batch tokens to avoid overwhelming the server
+  const batchSize = 500;
+  const batches = [];
+  for (let i = 0; i < tokens.length; i += batchSize) {
+    batches.push(tokens.slice(i, i + batchSize));
+  }
+
+  const results = [];
+  try {
+    // Send notifications to each token individually
+    const results = await Promise.allSettled(
+      tokens.map((token) =>
+        messaging.send({
+          token,
+          notification,
+          data: data || {},
+        })
+      )
+    );
+
+    const errors = results
+      .map((result, index) =>
+        result.status === "rejected"
+          ? {
+              token: tokens[index],
+              error: result.reason.message,
+              code: result.reason.code,
+            }
+          : null
+      )
+      .filter(Boolean);
+
+    const successCount = tokens.length - errors.length;
+    const status =
+      errors.length === tokens.length ? 400 : errors.length > 0 ? 207 : 200;
+    console.log(
+      `Sent notifications: ${successCount} succeeded, ${errors.length} failed`
+    );
+
+    return res.status(status).json({
+      status:
+        status === 200 ? "Ok" : status === 207 ? "Partial Success" : "Failed",
+      successCount,
+      failureCount: errors.length,
+      errors,
     });
   } catch (error) {
-    console.error("FCM Error:", error);
-    return res
-      .status(500)
-      .json({ error: "Internal server error", details: error.message });
+    console.error("Error sending notifications:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

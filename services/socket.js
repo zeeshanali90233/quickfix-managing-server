@@ -1,6 +1,7 @@
 // services/socket.js
 import { Server } from "socket.io";
 import { checkClientAuthSocket } from "../middleware/checkClientAuthSocket.js";
+import { sendPushNotification } from "../utils/fcm.js";
 
 let io;
 
@@ -21,11 +22,15 @@ function initializeNotificationNamespace() {
   const notificationNamespace = io.of("/notification");
 
   notificationNamespace.on("connection", (socket) => {
-    const groupId= socket.handshake.query.groupId;
+    const groupId = socket.handshake.query.groupId;
     socket.join(groupId);
 
     socket.on("send_message", (packet) => {
       notificationNamespace.to(packet.to).emit("notification", packet.message);
+    });
+
+    socket.on("send_push_fcm", (packet) => {
+      sendPushNotification(packet);
     });
 
     socket.on("public_announcement", (packet) => {
