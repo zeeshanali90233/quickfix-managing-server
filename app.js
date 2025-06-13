@@ -7,7 +7,7 @@ import { limiter } from "./config/rateLimiter.js";
 import { setupRoutes } from "./routes/v1.routes.js";
 import { initializeSocketIO } from "./services/socket.js";
 import { initializeDialogFlow } from "./services/dialogflow.js";
-import { initliazeCronJobs } from "./services/cron.js";
+import { initializeCronJobs } from "./services/cron.js";
 
 const initializeExpress = () => {
   const app = express();
@@ -37,7 +37,7 @@ const startServer = async (successCB = () => {}, errorCB = () => {}) => {
       (e) => console.error(`DialogFlow: ${e}`)
     );
 
-    initliazeCronJobs(
+    initializeCronJobs(
       (s) => console.log(`Cron: ${s}`),
       (e) => console.error(`Cron: ${e}`)
     );

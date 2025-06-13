@@ -3,50 +3,70 @@ import { sendEmail_Util } from "../utils/email.js";
 import { getDatabase } from "firebase-admin/database";
 import { adminInstance } from "../firebase/admin.js";
 
-export function initliazeCronJobs(successCB, errorCB) {
+export function initializeCronJobs(successCB, errorCB) {
   try {
-    cron.schedule("2 12 * * *", async () => {
-      console.log("Package Expiry Notifications");
+    cron.schedule("0 20 * * *", async () => {
+      console.log("Package Expiry Notifications - Started");
 
       try {
         const db = getDatabase(adminInstance);
-        const usersRef = db.ref("users");
-        const snapshot = await usersRef
-          .orderByChild("userData/role")
-          .equalTo(2)
-          .once("value");
+        const paymentsRef = db.ref("payments");
+
+        const paymentsSnapshot = await paymentsRef.once("value");
+        const paymentsData = paymentsSnapshot.val() || {};
 
         const promises = [];
+        const now = new Date();
+        const sevenDaysFromNow = new Date(
+          now.getTime() + 7 * 24 * 60 * 60 * 1000
+        ); // 7 days from now
 
-        snapshot.forEach((userSnap) => {
-          const userData = userSnap.child("userData").val();
-          const email = userData?.email;
-          const name = userData?.name || "Client";
+        for (const [paymentId, payment] of Object.entries(paymentsData)) {
+          const validTill = payment.validTill
+            ? new Date(payment.validTill)
+            : null;
 
-          if (email) {
-            promises.push(
-              sendEmail_Util({
-                to: email,
-                subject: " Reminder: Your Package is About to Expire",
-                html: `<h3>Hello ${name},</h3>
-                <p>This is a reminder from QuickFix: Your current package is nearing its expiry.</p>
-                <p>To avoid service disruption, please visit your dashboard to renew.</p>
-                <p>Thank you for choosing QuickFix!</p>`,
-              })
-            );
+          // Validate validTill and check if it's within 7 days
+          if (
+            validTill &&
+            !isNaN(validTill.getTime()) &&
+            validTill <= sevenDaysFromNow
+          ) {
+            // Fetch user data for the paymentId
+            const userSnapshot = await db
+              .ref(`users/${paymentId}/userData`)
+              .once("value");
+            const userData = userSnapshot.val() || {};
+            const email = userData.email;
+            const name = userData.businessName || userData.name || "Client";
+            if (email) {
+              promises.push(
+                sendEmail_Util({
+                  to: [email],
+                  subject: `Reminder: Your ${payment.name} Package is About to Expire`,
+                  htmlBody: `<h3>Hello ${name},</h3>
+                  <p>This is a reminder from QuickFix: Your <strong>${
+                    payment.name
+                  }</strong> package (valid until ${validTill.toLocaleDateString()}) is nearing its expiry.</p>
+                  <p>Remaining: ${payment.remaining} of ${payment.total}</p>
+                  <p>To avoid service disruption, please visit your dashboard to renew.</p>
+                  <p>Thank you for choosing QuickFix!</p>`,
+                })
+              );
+            }
           }
-        });
+        }
 
         await Promise.all(promises);
-        console.log("Package Expiry Emails Sent to Clients");
+        console.log(`Package Expiry Emails Sent to ${promises.length} Clients`);
       } catch (err) {
-        console.error("Failed to send emails:", err.message);
+        console.error("Failed to send package expiry emails:", err.message);
       }
     });
 
-    successCB("✅ Jobs initialized");
+    successCB("✅ Cron jobs initialized");
   } catch (error) {
-    errorCB(`❌ Failed to initialize Jobs: ${error}`);
+    errorCB(`❌ Failed to initialize cron jobs: ${error.message}`);
     throw error;
   }
 }
