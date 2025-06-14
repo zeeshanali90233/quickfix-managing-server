@@ -39,45 +39,44 @@ export const GetAllClients = async (req, res) => {
 
 export const GetAllClientsRequests = async (req, res) => {
   try {
-    console.log("Hi");
     const db = getDatabase(adminInstance);
-    const usersRef = db.ref("users");
+    const requestsRef = db.ref("request");
+    const snapshot = await requestsRef.once("value");
 
-    const query = usersRef.orderByChild("userData/role").equalTo(2);
-    const usersSnapshot = await query.once("value");
+    if (!snapshot.exists()) {
+      return res.status(200).json({
+        message: "No requests found",
+        count: 0,
+        businesses: [],
+      });
+    }
 
     const businessMap = new Map();
 
-    usersSnapshot.forEach((userSnapshot) => {
-      const userId = userSnapshot.key;
-      const userData = userSnapshot.child("userData").val();
-      const requestsCreated = userSnapshot.child("requestsCreated").val();
+    snapshot.forEach((requestSnapshot) => {
+      const request = requestSnapshot.val();
+      const businessName = request.businessName;
 
-      if (!userData || userData.role !== 2) return;
+      if (!businessName) return;
 
-      if (requestsCreated) {
-        Object.entries(requestsCreated).forEach(([requestId, requestData]) => {
-          const businessName = requestData.businessName;
-          if (!businessName) return;
+      const businessEntry = businessMap.get(businessName) || {
+        businessName,
+        requests: [],
+      };
 
-          const businessEntry = businessMap.get(businessName) || {
-            businessName,
-            requests: [],
-          };
+      businessEntry.requests.push({
+        requestID: requestSnapshot.key,
+        createdBy: request.createdBy || null,
+        timeStamp: request.timeStamp || null,
+        problemDescription: request.problemDescription || "",
+        requestDetail: request.requestDetail || "",
+        status: request.status || "pending",
+        technicianDetails: request.technicianDetails || {},
+        businessCordinates: request.businessCordinates || {},
+        businessAddress: request.businessAddress || "",
+      });
 
-          businessEntry.requests.push({
-            requestID: requestId,
-            createdBy: userId,
-            timeStamp: requestData.timeStamp || null,
-            problemDescription: requestData.problemDescription || "",
-            requestDetail: requestData.requestDetail || "",
-            status: requestData.status || "pending",
-            technicianDetails: requestData.technicianDetails || {},
-          });
-
-          businessMap.set(businessName, businessEntry);
-        });
-      }
+      businessMap.set(businessName, businessEntry);
     });
 
     const result = Array.from(businessMap.values()).sort((a, b) =>
@@ -87,14 +86,14 @@ export const GetAllClientsRequests = async (req, res) => {
     return res.status(200).json({
       message: result.length
         ? "Data retrieved successfully"
-        : "No business requests found for role 2 users",
+        : "No requests found",
       count: result.reduce((acc, curr) => acc + curr.requests.length, 0),
       businesses: result,
     });
   } catch (error) {
-    console.error("Error fetching business requests:", error);
+    console.error("Error fetching requests:", error);
     return res.status(500).json({
-      message: "Failed to retrieve business requests",
+      message: "Failed to retrieve requests",
       error: error.message,
     });
   }
