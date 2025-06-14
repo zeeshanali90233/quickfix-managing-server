@@ -10,8 +10,6 @@ const CreateClientAnnouncement = async (req, res) => {
   }
 
   try {
-    console.log("Creating client announcement...");
-
     // Prepare announcement data
     const announcementData = {
       title,
@@ -25,15 +23,12 @@ const CreateClientAnnouncement = async (req, res) => {
       .collection("announcements")
       .add(announcementData);
 
-    console.log("Client announcement saved with ID:", announcementRef.id);
-
     // Respond with success
     res.status(201).json({
       message: "Client Announcement Created Successfully",
       announcement: { id: announcementRef.id, ...announcementData },
     });
   } catch (error) {
-    console.error("Error while creating announcement:", error);
     res.status(500).json({
       message: "Failed to create announcement",
       error: error.message || "An unknown error occurred",
