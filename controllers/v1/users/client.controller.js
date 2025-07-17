@@ -293,6 +293,11 @@ export const BlockClient = async (req, res) => {
     const db = getDatabase(adminInstance);
     const userRef = db.ref(`users/${userId}/userData`);
 
+    await adminInstance.auth().updateUser(userId, {
+      disabled: true,
+    });
+
+    // Update user data in Realtime Database
     await userRef.update({
       isBlocked: true,
       blockedAt: Date.now(),
@@ -319,9 +324,14 @@ export const UnblockClient = async (req, res) => {
       });
     }
 
+    await adminInstance.auth().updateUser(userId, {
+      disabled: false,
+    });
+
     const db = getDatabase(adminInstance);
     const userRef = db.ref(`users/${userId}/userData`);
 
+    // Update user data in Realtime Database
     await userRef.update({
       isBlocked: false,
       unblockedAt: Date.now(),
