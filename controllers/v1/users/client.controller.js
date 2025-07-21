@@ -16,10 +16,12 @@ export const GetAllClients = async (req, res) => {
     const clients = [];
     snapshot.forEach((childSnapshot) => {
       const userData = childSnapshot.val().userData;
+      const fcmToken = childSnapshot.val()?.fcmToken ?? "";
       if (userData) {
         clients.push({
           id: childSnapshot.key,
           ...userData,
+          fcmToken: fcmToken,
         });
       }
     });
@@ -33,6 +35,82 @@ export const GetAllClients = async (req, res) => {
     return res.status(500).json({
       message: "Failed to get clients",
       error,
+    });
+  }
+};
+
+export const SearchClients = async (req, res) => {
+  try {
+    const { query, fields } = req.query;
+
+    if (!query || query.trim() === "") {
+      return res.status(400).json({
+        message: "Search query is required",
+        code: "INVALID_QUERY",
+      });
+    }
+
+    const searchQuery = query.trim().toLowerCase();
+    const searchFields = fields
+      ? fields.split(",").map((f) => f.trim())
+      : ["preferredUserID", "businessName"];
+
+    const db = getDatabase(adminInstance);
+    const usersRef = db.ref("users");
+
+    const dbQuery = usersRef.orderByChild("userData/role").equalTo(2);
+    const snapshot = await dbQuery.once("value");
+
+    if (snapshot.numChildren() === 0) {
+      return res.status(200).json({
+        message: "No clients found",
+        clients: [],
+        count: 0,
+      });
+    }
+
+    const matchedClients = [];
+    snapshot.forEach((childSnapshot) => {
+      const userData = childSnapshot.val().userData;
+      if (userData) {
+        let isMatch = false;
+
+        // Search in specified fields
+        for (const field of searchFields) {
+          const fieldValue = userData[field];
+          if (fieldValue && typeof fieldValue === "string") {
+            if (fieldValue.toLowerCase().includes(searchQuery)) {
+              isMatch = true;
+              break;
+            }
+          }
+        }
+
+        if (isMatch) {
+          matchedClients.push({
+            id: childSnapshot.key,
+            ...userData,
+          });
+        }
+      }
+    });
+
+    return res.status(200).json({
+      message:
+        matchedClients.length > 0
+          ? "Clients found"
+          : "No matching clients found",
+      clients: matchedClients,
+      count: matchedClients.length,
+      searchQuery: query.trim(),
+      searchFields,
+    });
+  } catch (error) {
+    const errorId = Math.random().toString(36).substring(2, 9);
+    return res.status(500).json({
+      message: "Failed to search clients",
+      error: error.message,
+      errorId,
     });
   }
 };

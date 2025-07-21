@@ -7,6 +7,7 @@ import {
   UpdateClientCredits,
   BlockClient,
   UnblockClient,
+  SearchClients,
 } from "../../../controllers/v1/users/client.controller.js";
 
 import {
@@ -23,12 +24,10 @@ clientRouter.get("/announcements", FetchClientAnnouncements);
 clientRouter.delete("/announcements/:id", DeleteClientAnnouncement);
 
 clientRouter.get("/", GetAllClients);
+clientRouter.get("/search", SearchClients);
 clientRouter.get("/requests", GetAllClientsRequests);
 clientRouter.get("/:id/requests", GetClientRequests);
 clientRouter.get("/:id", GetClientInfo); //client info individual
-clientRouter.get("/test", (req, res) => {
-  res.status(200).send({ message: "success" });
-});
 
 clientRouter.put("/:id/credits", UpdateClientCredits);
 clientRouter.put("/:id/block", BlockClient);
