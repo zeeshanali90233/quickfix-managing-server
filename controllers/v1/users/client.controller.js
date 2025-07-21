@@ -311,8 +311,6 @@ export const GetClientInfo = async (req, res) => {
     });
   } catch (error) {
     const errorId = Math.random().toString(36).substring(2, 9);
-    console.error(`[${errorId}] ${error.message}`);
-
     return res.status(500).json({
       message: "Failed to retrieve client info",
       error: error.message,
@@ -350,7 +348,6 @@ export const UpdateClientCredits = async (req, res) => {
     });
   } catch (error) {
     const errorId = Math.random().toString(36).substring(2, 9);
-    console.error(`[${errorId}] ${error.message}`);
     return res.status(500).json({
       message: "Failed to update credits",
       error: error.message,

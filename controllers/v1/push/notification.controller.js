@@ -71,10 +71,6 @@ export const sendNotifications = async (req, res) => {
     const successCount = tokens.length - errors.length;
     const status =
       errors.length === tokens.length ? 400 : errors.length > 0 ? 207 : 200;
-    console.log(
-      `Sent notifications: ${successCount} succeeded, ${errors.length} failed`
-    );
-
     return res.status(status).json({
       status:
         status === 200 ? "Ok" : status === 207 ? "Partial Success" : "Failed",
@@ -83,7 +79,6 @@ export const sendNotifications = async (req, res) => {
       errors,
     });
   } catch (error) {
-    console.error("Error sending notifications:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
