@@ -31,7 +31,6 @@ export const GetAllClients = async (req, res) => {
       clients,
     });
   } catch (error) {
-    console.error("Error fetching clients:", error);
     return res.status(500).json({
       message: "Failed to get clients",
       error,
@@ -292,6 +291,7 @@ export const GetClientInfo = async (req, res) => {
     }
 
     const userData = userSnapshot.val().userData;
+    const fcmToken = userSnapshot.val()?.fcmToken || "";
     if (userData?.role !== 2) {
       return res.status(403).json({
         message: "User is not a client",
@@ -301,6 +301,7 @@ export const GetClientInfo = async (req, res) => {
 
     const response = {
       id: userId,
+      fcmToken: fcmToken,
       userData: userData,
       package: packageSnapshot.exists() ? packageSnapshot.val() : null,
     };
