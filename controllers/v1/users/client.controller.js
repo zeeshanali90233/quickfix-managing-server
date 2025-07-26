@@ -333,8 +333,9 @@ export const UpdateClientCredits = async (req, res) => {
 
     const db = getDatabase(adminInstance);
     const creditRef = db.ref(`payments/${userId}/`);
+    const creditValue = (await creditRef.child("total").once("value")).val() || 0;
     await creditRef.update({
-      total: adminInstance.database.ServerValue.increment(Number(credits)),
+      total: creditValue + Number(credits),
       validTill: validTill || null,
       updatedAt: Date.now(),
     });
