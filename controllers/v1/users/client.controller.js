@@ -1,6 +1,5 @@
 import { getDatabase } from "firebase-admin/database";
 import { adminInstance } from "../../../firebase/admin.js";
-import { increment } from "firebase-admin/database";
 
 export const GetAllClients = async (req, res) => {
   try {
@@ -335,7 +334,7 @@ export const UpdateClientCredits = async (req, res) => {
     const db = getDatabase(adminInstance);
     const creditRef = db.ref(`payments/${userId}/`);
     await creditRef.update({
-      total: increment(Number(credits)),
+      total: adminInstance.database.ServerValue.increment(Number(credits)),
       validTill: validTill || null,
       updatedAt: Date.now(),
     });
