@@ -322,7 +322,7 @@ export const GetClientInfo = async (req, res) => {
 export const UpdateClientCredits = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { credits } = req.body;
+    const { credits, validTill } = req.body;
 
     if (!userId || !credits) {
       return res.status(400).json({
@@ -332,13 +332,11 @@ export const UpdateClientCredits = async (req, res) => {
     }
 
     const db = getDatabase(adminInstance);
-    const date = new Date();
-    const monthYear = `${date.getMonth()}_${date.getFullYear()}`;
-    const creditRef = db.ref(`payments/${userId}/${monthYear}`);
-
+    const creditRef = db.ref(`payments/${userId}/`);
+    const creditValue = (await creditRef.child("total").once("value")).val() || 0;
     await creditRef.update({
-      total: credits,
-      remaining: credits,
+      total: creditValue + Number(credits),
+      validTill: validTill || null,
       updatedAt: Date.now(),
     });
 
