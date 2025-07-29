@@ -149,6 +149,7 @@ export const GetAllClientsRequests = async (req, res) => {
         requestDetail: request.requestDetail || "",
         status: request.status || "pending",
         technicianDetails: request.technicianDetails || {},
+        statusDetails: request.statusDetails || {},
         businessCordinates: request.businessCordinates || {},
         businessAddress: request.businessAddress || "",
       });
